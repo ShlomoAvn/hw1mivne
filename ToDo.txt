@@ -1,0 +1,84 @@
+General Data Structure:
+1. AVL Tree of movies by ID
+2. AVL Tree of users by ID (AllUsers)
+3. AVL Tree of groups by ID: each node represents a group, each group holds an AVL tree of users by ID
+    - pointer between AllUsers and its group's node - update group sum totals in O(1) as needed
+    - user in group node is a pointer of the actual user node held in AllUsers
+    - counter of # users in each group held by group node
+    - bool value of VIP held by group node - true if at least one user in group is VIP
+    - update values held by group node during insertion to group using logm complexity
+4. 4 AVL rank Trees, one per genre, organized by: rate, views, ID
+    - pointer between node in large tree and node in genre tree
+    - each node points to the "max" node in its subtree
+5. Counter of # movies in system total
+6. AVL rank tree of all movies according to: rate, views, ID
+
+***Might be easier to just add a field in MultiTree that points to max term always (rather than make rank tree)
+
+
+Functions:
+- streaming_database: *Shlomo
+    - initialize 7 empty AVL trees, according to the list above
+    - counter of # movies in total system = 0
+    - etc.
+Done!- virtual ~streaming_database(): *Sarah
+    - delete
+Done!- add_movie: *Shlomo
+    - insert to allMovies AVL tree
+    - insert to allMovies MultiAVL Tree
+    - insert to relevant genre tree (unless genre=NULL)
+    - define fields as given
+Done! - remove_move: *Sarah
+    - delete from AVL tree of allMovies
+    - delete from allMovies MultiAVL tree
+    - delete from genre tree if relevant
+Done!- add_user: *Shlomo
+    - insert to AllUsers Tree
+    - initialize fields
+Done! - remove_user: *Sarah
+    - remove from AllUsers tree
+    - remove from group tree if in a group
+Done!- add_group: *Shlomo
+    - add group to AVL tree of all groups
+    - initialize fields
+ Done! - remove_group: *Sarah
+    - go over tree of users inside group, set each user's groupID = nullptr
+    - remove group from AVL tree
+Done!- add_user_to_group: *Shlomo
+    - search for user in AllUsers Tree
+    - search for group in group Tree
+    - add user to group tree's user tree
+    - update user's groupID pointer
+    - add the user's views from each genre to the total views array (totalViews)
+    - subtract the user's views from total views for each genre in the group's node (GroupViews array)
+Done! - user_watch: *Sarah
+    - find user and movie
+    - check if user is VIP and if movie is VIP
+    - increase views on movie by 1
+    - insert and delete from allMovies MultiAVL tree
+    - ++ to views in that genre for user
+    - ++ to views in that genre for user's group (if exists) in totalViews
+Done! - group_watch: *Sarah
+    - find group in tree
+    - find movie
+    - check VIP thing
+    - ++ to views in that genre in GroupViews
+    - ++*(# users) to views in that genre in totalViews
+    _ ++*(#users) to views on that movie
+    - insert and delete from allMovies MultiAVL tree
+Done! need to check things- get_all_movies_count: *Shlomo
+    - go to the AVL rank tree of relevant genre and return number of children held by the root
+    - if genre=NONE, return counter of number of movies in system
+Done! - get_all_movies: *Sarah
+    - if None: return *opposite* inorder walk on allMovies MultiAVL tree
+    - otherwise: return *opposite* inorder walk on movie MultiAVL tree by genre
+Done!- get_num_views: *Shlomo
+    - return number of views + group's GroupViews for that user
+Done! - rate_movie: *Shlomo
+    - ++ to number of people who rated the movie
+    - += to the rating
+    - insert and remove from MultiAVL allMovies tree
+    - insert and remove from MultiAVL movies tree according to genre (if not NONE)
+- get_group_recommendation: ***
+    - determine favorite genre by finding max in totalViews array of that group
+    - choose the "max" movie in the correct genre (according to the pointer in the root of that genre's MultiAVL tree)
